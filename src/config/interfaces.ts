@@ -1,4 +1,3 @@
-// Tipo per il singolo gioco della Steam Web API
 export interface SteamGame {
   appid: number;
   name: string;
@@ -7,7 +6,6 @@ export interface SteamGame {
   playtime_forever?: number;
 }
 
-// Struttura della risposta Steam
 export interface SteamOwnedGamesResponse {
   response: {
     game_count: number;
@@ -15,10 +13,21 @@ export interface SteamOwnedGamesResponse {
   };
 }
 
-// Tipo standardizzato per l'app
 export interface Game {
   id: string;
   title: string;
   platform: string;
   image?: string;
+}
+
+export interface GameContextProps {
+  loading: Loading;
+  steamGames: Game[];
+  gogGames: Game[];
+  fetchSteamGames: () => Promise<void>;
+  fetchGogGames: () => Promise<void>;
+}
+
+export interface Loading {
+  [key: string]: boolean;
 }

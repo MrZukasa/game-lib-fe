@@ -1,12 +1,6 @@
 // src/components/GameList.tsx
+import type { Game } from "../config/interfaces";
 import GameCard from "./GameCard";
-
-interface Game {
-  id: string;
-  title: string;
-  platform: string;
-  image?: string;
-}
 
 interface GameListProps {
   games: Game[];
