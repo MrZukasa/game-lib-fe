@@ -1,4 +1,3 @@
-// src/components/GameList.tsx
 import type { Game } from "../config/interfaces";
 import GameCard from "./GameCard";
 

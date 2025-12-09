@@ -1,4 +1,3 @@
-// src/components/GameCard.tsx
 interface GameCardProps {
   title: string;
   platform: string;
