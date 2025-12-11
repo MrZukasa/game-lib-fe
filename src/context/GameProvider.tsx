@@ -55,6 +55,9 @@ const GameProvider = ({ children }: { children: ReactNode }): ReactElement => {
           Authorization: `${tokenRes.data.Token}`,
           Accept: "application/json",
         },
+        params: {
+          uhs: tokenRes.data.DisplayClaims.xui[0].uhs
+        }
       });
       const parsedGame = (games: XboxGame[]): Game[] => {
         return games.map(game => ({
@@ -78,12 +81,26 @@ const GameProvider = ({ children }: { children: ReactNode }): ReactElement => {
     setLoading({ ...loading, amazon: true });
     try {
       const tokenRes = await axios.post<AmazonAuthResponse>(`${ENDPOINT}amazon/token`);
-      const res = await axios.get<AmazonTitleResponse>(`${ENDPOINT}amazon/games`, {
+
+      let res = await axios.get<AmazonTitleResponse>(`${ENDPOINT}amazon/games`, {
         headers: {
           Authorization: `${tokenRes.data.access_token}`,
           Accept: "application/json",
         },
       });
+      const input = res.data.entitlements;
+
+      while (res.data.nextToken) {
+        res = await axios.get<AmazonTitleResponse>(`${ENDPOINT}amazon/games`, {
+          headers: {
+            Authorization: `${tokenRes.data.access_token}`,
+            Accept: 'application/json',
+            nextToken: res.data.nextToken
+          },
+        });
+        input.push(...res.data.entitlements);
+      }
+
       const parsedGame = (games: AmazonGame[]): Game[] => {
         return games.map(game => ({
           id: game.id,
@@ -92,11 +109,12 @@ const GameProvider = ({ children }: { children: ReactNode }): ReactElement => {
           image: game.product.productDetail.iconUrl
         }))
       }
-      const input = res.data.entitlements;
+
       const amazonGameLibrary = parsedGame(input)
       setAmazonGames(amazonGameLibrary);
-    } catch {
-      throw new Error("Error fetching Xbox games");
+    } catch (err) {
+      console.log(err)
+      throw new Error("Error fetching Amazon games");
     } finally {
       setLoading({ ...loading, amazon: false });
     }

@@ -48,7 +48,7 @@ const Home: FC = (): ReactElement => {
 
         <button onClick={fetchAmazonGames} className="px-4 py-2 bg-yellow-600 text-white rounded cursor-pointer transform transition ease-in-out duration-100 active:bg-yellow-300 active:text-black flex items-center gap-2">
           Carica giochi Amazon
-          {loading.xbox &&
+          {loading.amazon &&
             <svg className="w-6" fill="#FFFFFFFF" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path d="M10.14,1.16a11,11,0,0,0-9,8.92A1.59,1.59,0,0,0,2.46,12,1.52,1.52,0,0,0,4.11,10.7a8,8,0,0,1,6.66-6.61A1.42,1.42,0,0,0,12,2.69h0A1.57,1.57,0,0,0,10.14,1.16Z">
                 <animateTransform attributeName="transform" type="rotate" dur="0.75s" values="0 12 12;360 12 12" repeatCount="indefinite" />
@@ -56,7 +56,7 @@ const Home: FC = (): ReactElement => {
             </svg>}
 
         </button>
-        {xboxGames && <GameList games={amazonGames} />}
+        {amazonGames && <GameList games={amazonGames} />}
 
       </div>
     </div >
