@@ -1,6 +1,5 @@
 import { type FC, type ReactElement } from "react";
 import GameList from "../components/GameList";
-import { GOG_CLIENT_ID, GOG_LOGIN_URL, GOG_REDIRECT_URI } from "../config/const";
 import useGame from "../hook/useGame";
 
 const Home: FC = (): ReactElement => {
@@ -10,14 +9,6 @@ const Home: FC = (): ReactElement => {
     <div className="p-8 space-y-6">
       <p className="text-3xl font-bold">La mia libreria di giochi</p>
       <div className="space-y-3">
-        <a
-          href={`${GOG_LOGIN_URL}?client_id=${GOG_CLIENT_ID}&redirect_uri=${GOG_REDIRECT_URI}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 underline block w-fit"
-        >
-          Login GOG
-        </a>
 
         <button onClick={fetchSteamGames}
           className="px-4 py-2 bg-blue-700 text-white rounded cursor-pointer transform transition ease-in-out duration-100 :bg-blue-300 active:text-black flex items-center gap-2">
