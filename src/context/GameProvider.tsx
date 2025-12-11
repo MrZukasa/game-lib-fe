@@ -1,17 +1,19 @@
 import axios from "axios";
 import { useState, type ReactElement, type ReactNode } from "react";
 import { ENDPOINT } from "../config/const";
-import type { Game, Loading, XboxAuthResponse, XboxGame, XboxTitleResponse } from "../config/interfaces";
+import type { AmazonAuthResponse, AmazonGame, AmazonTitleResponse, Game, Loading, XboxAuthResponse, XboxGame, XboxTitleResponse } from "../config/interfaces";
 import { GameContext } from "./GameContext";
 
 const GameProvider = ({ children }: { children: ReactNode }): ReactElement => {
   const [steamGames, setSteamGames] = useState<Game[]>([]);
   const [gogGames, setGogGames] = useState<Game[]>([]);
   const [xboxGames, setXboxGames] = useState<Game[]>([]);
+  const [amazonGames, setAmazonGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState<Loading>({
     steam: false,
     gog: false,
-    xbox: false
+    xbox: false,
+    amazon: false
   });
 
   const fetchSteamGames = async (): Promise<void> => {
@@ -54,7 +56,6 @@ const GameProvider = ({ children }: { children: ReactNode }): ReactElement => {
           Accept: "application/json",
         },
       });
-      const input = res.data.titles;
       const parsedGame = (games: XboxGame[]): Game[] => {
         return games.map(game => ({
           id: game.titleId,
@@ -63,6 +64,7 @@ const GameProvider = ({ children }: { children: ReactNode }): ReactElement => {
           image: game.displayImage
         }))
       }
+      const input = res.data.titles;
       const xboxGameLibrary = parsedGame(input)
       setXboxGames(xboxGameLibrary);
     } catch {
@@ -72,8 +74,37 @@ const GameProvider = ({ children }: { children: ReactNode }): ReactElement => {
     }
   };
 
+  const fetchAmazonGames = async (): Promise<void> => {
+    setLoading({ ...loading, amazon: true });
+    try {
+      const tokenRes = await axios.post<AmazonAuthResponse>(`${ENDPOINT}amazon/token`);
+      const res = await axios.get<AmazonTitleResponse>(`${ENDPOINT}amazon/games`, {
+        headers: {
+          Authorization: `${tokenRes.data.access_token}`,
+          Accept: "application/json",
+        },
+      });
+      const parsedGame = (games: AmazonGame[]): Game[] => {
+        return games.map(game => ({
+          id: game.id,
+          title: game.product.title,
+          platform: "PC",
+          image: game.product.productDetail.iconUrl
+        }))
+      }
+      const input = res.data.entitlements;
+      const amazonGameLibrary = parsedGame(input)
+      setAmazonGames(amazonGameLibrary);
+    } catch {
+      throw new Error("Error fetching Xbox games");
+    } finally {
+      setLoading({ ...loading, amazon: false });
+    }
+  };
+
+
   return (
-    <GameContext.Provider value={{ loading, steamGames, gogGames, xboxGames, fetchSteamGames, fetchGogGames, fetchXboxGames }}>
+    <GameContext.Provider value={{ loading, steamGames, gogGames, xboxGames, amazonGames, fetchSteamGames, fetchGogGames, fetchXboxGames, fetchAmazonGames }}>
       {children}
     </GameContext.Provider>
   );
